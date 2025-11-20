@@ -25,30 +25,33 @@ export const filterTasksByWeek = (tasks: Task[]): Task[] => {
 
 export const getCategoryColor = (category: TaskCategory): string => {
   const colors = {
-    work: 'hsl(var(--category-work))',
-    personal: 'hsl(var(--category-personal))',
-    health: 'hsl(var(--category-health))',
-    other: 'hsl(var(--category-other))',
+    work: 'hsl(220, 90%, 56%)',
+    personal: 'hsl(142, 76%, 45%)',
+    study: 'hsl(250, 80%, 60%)',
+    shopping: 'hsl(340, 82%, 52%)',
+    fitness: 'hsl(25, 95%, 53%)',
   };
   return colors[category];
 };
 
 export const getCategoryBgClass = (category: TaskCategory): string => {
   const classes = {
-    work: 'bg-[hsl(220_90%_56%_/_0.1)]',
-    personal: 'bg-[hsl(142_76%_45%_/_0.1)]',
-    health: 'bg-[hsl(25_95%_53%_/_0.1)]',
-    other: 'bg-[hsl(240_5%_64%_/_0.1)]',
+    work: 'bg-blue-500/10',
+    personal: 'bg-green-500/10',
+    study: 'bg-purple-500/10',
+    shopping: 'bg-pink-500/10',
+    fitness: 'bg-orange-500/10',
   };
   return classes[category];
 };
 
 export const getCategoryTextClass = (category: TaskCategory): string => {
   const classes = {
-    work: 'text-[hsl(220_90%_56%)]',
-    personal: 'text-[hsl(142_76%_45%)]',
-    health: 'text-[hsl(25_95%_53%)]',
-    other: 'text-[hsl(240_5%_64%)]',
+    work: 'text-blue-600 dark:text-blue-400',
+    personal: 'text-green-600 dark:text-green-400',
+    study: 'text-purple-600 dark:text-purple-400',
+    shopping: 'text-pink-600 dark:text-pink-400',
+    fitness: 'text-orange-600 dark:text-orange-400',
   };
   return classes[category];
 };

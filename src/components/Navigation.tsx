@@ -1,50 +1,28 @@
-import { NavLink } from 'react-router-dom';
-import { Home, Plus, User, CheckSquare } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { User, Bell } from 'lucide-react';
 
 const Navigation = () => {
-  const navItems = [
-    { to: '/', label: 'Home', icon: Home },
-    { to: '/add-task', label: 'Add Task', icon: Plus },
-    { to: '/profile', label: 'Profile', icon: User },
-  ];
-
   return (
-    <nav className="sticky top-0 z-50 bg-card border-b border-border shadow-sm">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center">
-              <CheckSquare className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
-              Task Manager
-            </h1>
-          </div>
+    <header className="sticky top-0 z-30 h-16 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 shadow-sm">
+      <div className="h-full px-6 lg:px-8 flex items-center justify-between">
+        <div className="hidden lg:block">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+            Welcome back
+          </h2>
+        </div>
 
-          <div className="flex gap-1">
-            {navItems.map(({ to, label, icon: Icon }) => (
-              <NavLink
-                key={to}
-                to={to}
-                className={({ isActive }) =>
-                  cn(
-                    'flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300',
-                    'hover:bg-accent hover:text-accent-foreground',
-                    isActive
-                      ? 'bg-primary text-primary-foreground font-medium'
-                      : 'text-muted-foreground'
-                  )
-                }
-              >
-                <Icon className="w-4 h-4" />
-                <span className="hidden sm:inline">{label}</span>
-              </NavLink>
-            ))}
-          </div>
+        {/* Right side - user menu */}
+        <div className="flex items-center gap-3 ml-auto">
+          <button className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
+            <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+          </button>
+          <button className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
+            <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
+              <User className="w-5 h-5 text-white" />
+            </div>
+          </button>
         </div>
       </div>
-    </nav>
+    </header>
   );
 };
 

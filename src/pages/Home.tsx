@@ -7,11 +7,14 @@ import TaskCard from '@/components/TaskCard';
 import TaskDetailsDialog from '@/components/TaskDetailsDialog';
 import DeleteConfirmDialog from '@/components/DeleteConfirmDialog';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Calendar, CalendarDays, LayoutList } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Calendar, CalendarDays, LayoutList, CheckCircle, Search, SlidersHorizontal, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
-type FilterType = 'all' | 'today' | 'week';
+type FilterType = 'all' | 'today' | 'week' | 'completed';
+type SortType = 'date' | 'priority' | 'category';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -19,6 +22,8 @@ const Home = () => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
   const [filter, setFilter] = useState<FilterType>('all');
+  const [sortBy, setSortBy] = useState<SortType>('date');
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     loadTasks();
@@ -30,14 +35,31 @@ const Home = () => {
   };
 
   const getFilteredTasks = (): Task[] => {
+    let filtered: Task[] = [];
+
     switch (filter) {
       case 'today':
-        return filterTasksByToday(tasks);
+        filtered = filterTasksByToday(tasks);
+        break;
       case 'week':
-        return filterTasksByWeek(tasks);
+        filtered = filterTasksByWeek(tasks);
+        break;
+      case 'completed':
+        filtered = tasks.filter(t => t.completed);
+        break;
       default:
-        return tasks;
+        filtered = tasks;
     }
+
+    // Apply search filter
+    if (searchQuery.trim()) {
+      filtered = filtered.filter(task =>
+        task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        task.description.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    return filtered;
   };
 
   const handleToggleComplete = (taskId: string) => {
@@ -65,26 +87,50 @@ const Home = () => {
 
   const filteredTasks = getFilteredTasks();
   const sortedTasks = [...filteredTasks].sort((a, b) => {
-    if (a.completed !== b.completed) return a.completed ? 1 : -1;
-    return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+    // Always put incomplete tasks first unless viewing completed
+    if (filter !== 'completed' && a.completed !== b.completed) {
+      return a.completed ? 1 : -1;
+    }
+
+    // Then sort by selected criteria
+    switch (sortBy) {
+      case 'priority':
+        const priorityOrder = { high: 0, medium: 1, low: 2 };
+        return priorityOrder[a.priority] - priorityOrder[b.priority];
+      case 'category':
+        return a.category.localeCompare(b.category);
+      case 'date':
+      default:
+        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+    }
   });
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
-          My Tasks
-        </h1>
-        <p className="text-muted-foreground">
-          Manage and organize your tasks efficiently
-        </p>
+    <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
+            All Tasks
+          </h1>
+          <p className="text-muted-foreground">
+            Manage and organize your tasks efficiently
+          </p>
+        </div>
+        <Button
+          onClick={() => navigate('/add-task')}
+          className="bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 transition-all duration-300 shadow-lg shadow-primary/25"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          New Task
+        </Button>
       </div>
 
+      {/* Filter Tabs */}
       <Tabs value={filter} onValueChange={(value) => setFilter(value as FilterType)} className="mb-6">
-        <TabsList className="grid w-full max-w-md grid-cols-3">
+        <TabsList className="grid w-full max-w-2xl grid-cols-4 h-12">
           <TabsTrigger value="all" className="gap-2">
             <LayoutList className="w-4 h-4" />
-            All Tasks
+            All
           </TabsTrigger>
           <TabsTrigger value="today" className="gap-2">
             <Calendar className="w-4 h-4" />
@@ -94,8 +140,36 @@ const Home = () => {
             <CalendarDays className="w-4 h-4" />
             This Week
           </TabsTrigger>
+          <TabsTrigger value="completed" className="gap-2">
+            <CheckCircle className="w-4 h-4" />
+            Completed
+          </TabsTrigger>
         </TabsList>
       </Tabs>
+
+      {/* Search and Sort */}
+      <div className="flex flex-col sm:flex-row gap-4 mb-6">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="Search tasks..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10 h-11"
+          />
+        </div>
+        <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortType)}>
+          <SelectTrigger className="w-full sm:w-48 h-11">
+            <SlidersHorizontal className="w-4 h-4 mr-2" />
+            <SelectValue placeholder="Sort by" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="date">Sort by Date</SelectItem>
+            <SelectItem value="priority">Sort by Priority</SelectItem>
+            <SelectItem value="category">Sort by Category</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
       {tasks.length === 0 ? (
         <div className="text-center py-16">

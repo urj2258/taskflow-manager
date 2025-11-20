@@ -1,10 +1,11 @@
 import { Task } from '@/types/task';
-import { Calendar, Tag, Trash2, Edit, CheckCircle2, Circle } from 'lucide-react';
+import { Calendar, Tag, Trash2, Edit, CheckCircle2, Circle, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { getCategoryBgClass, getCategoryTextClass } from '@/lib/taskUtils';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 interface TaskCardProps {
   task: Task;
@@ -70,12 +71,12 @@ const TaskCard = ({ task, onToggleComplete, onDelete, onEdit, onClick }: TaskCar
                 </p>
               )}
 
-              <div className="flex flex-wrap items-center gap-3 text-xs">
+              <div className="flex flex-wrap items-center gap-2 text-xs">
                 <div className="flex items-center gap-1.5 text-muted-foreground">
                   <Calendar className="w-3.5 h-3.5" />
                   <span>{format(new Date(task.dueDate), 'MMM dd, yyyy')}</span>
                 </div>
-                
+
                 <div className={cn(
                   "flex items-center gap-1.5 px-2 py-1 rounded-md",
                   getCategoryBgClass(task.category),
@@ -84,6 +85,14 @@ const TaskCard = ({ task, onToggleComplete, onDelete, onEdit, onClick }: TaskCar
                   <Tag className="w-3.5 h-3.5" />
                   <span className="capitalize font-medium">{task.category}</span>
                 </div>
+
+                <Badge
+                  variant={task.priority === 'high' ? 'destructive' : task.priority === 'medium' ? 'default' : 'secondary'}
+                  className="text-xs"
+                >
+                  <AlertCircle className="w-3 h-3 mr-1" />
+                  {task.priority}
+                </Badge>
               </div>
             </div>
           </div>
